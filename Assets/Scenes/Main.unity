@@ -550,6 +550,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   forwardSpeed: 10
+  laneDistance: 4
+  laneChangeSpeed: 12
 --- !u!143 &1008003506
 CharacterController:
   m_ObjectHideFlags: 0
