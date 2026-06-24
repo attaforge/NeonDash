@@ -2,15 +2,22 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Forward Movement")]
     [SerializeField] private float forwardSpeed = 10f;
 
-    [SerializeField] private float laneDistance = 3f;
-    [SerializeField] private float laneChangeSpeed = 10f;
+    [Header("Lane Movement")]
+    [SerializeField] private float laneDistance = 4f;
+    [SerializeField] private float laneChangeSpeed = 12f;
+
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpHeight = 2f;
+    [SerializeField] private float gravity = -20f;
+
+    private CharacterController controller;
 
     private int currentLane = 1;
 
-    private CharacterController controller;
+    private float verticalVelocity;
 
     private void Awake()
     {
@@ -20,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         HandleLaneInput();
+        HandleJump();
 
         Vector3 targetPosition = transform.position;
         targetPosition.x = (currentLane - 1) * laneDistance;
@@ -29,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 movement = new Vector3(
             horizontalMovement,
-            0f,
+            verticalVelocity,
             forwardSpeed
         );
 
@@ -51,5 +59,24 @@ public class PlayerController : MonoBehaviour
         }
 
         currentLane = Mathf.Clamp(currentLane, 0, 2);
+    }
+
+    private void HandleJump()
+    {
+        if (controller.isGrounded)
+        {
+            if (verticalVelocity < 0)
+            {
+                verticalVelocity = -2f;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                verticalVelocity =
+                    Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
+        }
+
+        verticalVelocity += gravity * Time.deltaTime;
     }
 }
