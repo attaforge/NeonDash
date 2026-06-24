@@ -13,6 +13,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float gravity = -20f;
 
+    [Header("Slide Settings")]
+    [SerializeField] private float slideDuration = 1f;
+    [SerializeField] private float slideHeight = 1f;
+
+    private bool isSliding;
+    private float slideTimer;
+
+    private float originalHeight;
+    private Vector3 originalCenter;
+
     private CharacterController controller;
 
     private int currentLane = 1;
@@ -22,12 +32,21 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        
+        originalHeight = controller.height;
+        originalCenter = controller.center;
     }
 
     private void Update()
     {
+        if (GameManager.Instance.IsGameOver())
+        {
+            return;
+        }
+
         HandleLaneInput();
         HandleJump();
+        HandleSlide();
 
         Vector3 targetPosition = transform.position;
         targetPosition.x = (currentLane - 1) * laneDistance;
@@ -80,11 +99,54 @@ public class PlayerController : MonoBehaviour
         verticalVelocity += gravity * Time.deltaTime;
     }
 
+    private void HandleSlide()
+    {
+        if (!isSliding)
+        {
+            if (Input.GetKeyDown(KeyCode.S) ||
+                Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                StartSlide();
+            }
+        }
+        else
+        {
+            slideTimer -= Time.deltaTime;
+
+            if (slideTimer <= 0f)
+            {
+                StopSlide();
+            }
+        }
+    }
+
+    private void StartSlide()
+    {
+        isSliding = true;
+        slideTimer = slideDuration;
+
+        controller.height = slideHeight;
+
+        controller.center = new Vector3(
+            originalCenter.x,
+            slideHeight / 2f,
+            originalCenter.z
+        );
+    }
+
+    private void StopSlide()
+    {
+        isSliding = false;
+
+        controller.height = originalHeight;
+        controller.center = originalCenter;
+    }
+
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.gameObject.CompareTag("Obstacle"))
         {
-            Debug.Log("Game Over");
+            GameManager.Instance.GameOver();
         }
     }
 }
