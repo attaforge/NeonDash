@@ -79,4 +79,12 @@ public class PlayerController : MonoBehaviour
 
         verticalVelocity += gravity * Time.deltaTime;
     }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("Game Over");
+        }
+    }
 }
