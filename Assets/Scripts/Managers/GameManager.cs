@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 
     private bool isGameOver;
 
+    private float score;
+
     private void Awake()
     {
         if (Instance == null)
@@ -16,6 +18,14 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Update()
+    {
+        if (isGameOver)
+            return;
+
+        score += Time.deltaTime * 10f;
     }
 
     public bool IsGameOver()
@@ -31,5 +41,11 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
 
         Debug.Log("GAME OVER");
+        Debug.Log("Final Score: " + Mathf.FloorToInt(score));
+    }
+
+    public int GetScore()
+    {
+        return Mathf.FloorToInt(score);
     }
 }
